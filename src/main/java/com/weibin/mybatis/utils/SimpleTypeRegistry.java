@@ -34,4 +34,8 @@ public class SimpleTypeRegistry {
     public static boolean isSimpleType(Class<?> clazz) {
         return SIMPLE_TYPE_SET.contains(clazz);
     }
+
+    public static void main(String[] args) throws ClassNotFoundException {
+        System.out.println(isSimpleType(Integer.class));
+    }
 }

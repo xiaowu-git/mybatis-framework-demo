@@ -28,10 +28,14 @@ public class MyBatisV1 {
     public void test() {
         loadProperties("jdbc.properties");
         // 封装入参
-        Map<String, Object> map = new HashMap<>();
+        /*Map<String, Object> map = new HashMap<>();
         map.put("username", "伟斌");
         map.put("age", 20);
-        List<User> userList = selectList("queryUserByName", map);
+        List<User> userList = selectList("queryUserByNameAndAge", map);*/
+        User user = new User();
+        user.setUsername("伟斌");
+        user.setAge(20);
+        List<User> userList = selectList("queryUserByNameAndAge", user);
         System.out.println(userList);
     }
 
@@ -55,18 +59,28 @@ public class MyBatisV1 {
             connection = DriverManager.getConnection(properties.getProperty("db.url"), properties.getProperty("db.username"), properties.getProperty("db.password"));
             // 3.获取statement
             statement = connection.prepareStatement(properties.getProperty("db.sql." + statmentId));
-            // 4.设置参数
-            if (SimpleTypeRegistry.isSimpleType(params.getClass())) {
+            // 4.获取入参类型并设置参数
+            String parameterType = properties.getProperty("db.sql." + statmentId + ".parameterType");
+            Class<?> parameterTypeClass = Class.forName(parameterType);
+            if (SimpleTypeRegistry.isSimpleType(parameterTypeClass)) {
                 statement.setObject(1, params);
             }else if (params instanceof Map) {
-                Map paramsMap = (Map) params;
+                Map map = (Map) params;
+                // 获取入参字段
                 String[] paramNames = properties.getProperty("db.sql." + statmentId + ".paramnames").split(",");
                 for (int i = 0; i < paramNames.length; i++) {
-                    Object value = paramsMap.get(paramNames[i]);
+                    Object value = map.get(paramNames[i]);
                     statement.setObject(i + 1, value);
                 }
             }else {
-                // TODO
+                // 获取入参字段
+                String[] paramNames = properties.getProperty("db.sql." + statmentId + ".paramnames").split(",");
+                for (int i = 0; i < paramNames.length; i++) {
+                    Field field = parameterTypeClass.getDeclaredField(paramNames[i]);
+                    field.setAccessible(true);
+                    Object value = field.get(params);
+                    statement.setObject(i + 1, value);
+                }
             }
             // 5.执行查询
             rs = statement.executeQuery();
