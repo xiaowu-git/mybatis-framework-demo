@@ -1,12 +1,15 @@
 package com.weibin.mybatis.test;
 
+import com.weibin.mybatis.pojo.User;
 import com.weibin.mybatis.utils.SimpleTypeRegistry;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -22,8 +25,14 @@ public class MyBatisV1 {
     private Properties properties = new Properties();
 
     @Test
-    private void test() {
-
+    public void test() {
+        loadProperties("jdbc.properties");
+        // 封装入参
+        Map<String, Object> map = new HashMap<>();
+        map.put("username", "伟斌");
+        map.put("age", 20);
+        List<User> userList = selectList("queryUserByName", map);
+        System.out.println(userList);
     }
 
     private void loadProperties(String path) {
@@ -67,9 +76,19 @@ public class MyBatisV1 {
             Object resultPojo = null;
             while (rs.next()) {
                 resultPojo = returnClass.newInstance();
-
+                ResultSetMetaData rsMetaData = rs.getMetaData();
+                int columnCount = rsMetaData.getColumnCount();
+                // 利用反射为结果实例字段赋值
+                for (int i = 1; i <= columnCount; i++) {
+                    // 获取结果集列名
+                    String columnName = rsMetaData.getColumnName(i);
+                    Field field = returnClass.getDeclaredField(columnName);
+                    field.setAccessible(true);
+                    field.set(resultPojo, rs.getObject(i));
+                }
+                resultList.add((T) resultPojo);
             }
-
+            return resultList;
 
         } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
@@ -77,6 +96,30 @@ public class MyBatisV1 {
             e.printStackTrace();
         } catch (InstantiationException e) {
             e.printStackTrace();
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        }finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (statement != null) {
+                try {
+                    statement.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
         }
         return resultList;
     }
