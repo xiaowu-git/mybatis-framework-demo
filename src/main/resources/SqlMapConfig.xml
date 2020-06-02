@@ -1,0 +1,18 @@
+<configuration>
+    <!-- 数据源环境配置 -->
+    <environments default="dev">
+        <environment id="dev">
+            <dataSource type="DBCP">
+                <property name="driver" value="com.mysql.jdbc.Driver"></property>
+                <property name="url" value="jdbc:mysql://127.0.0.1/mybatis-test"></property>
+                <property name="username" value="root"></property>
+                <property name="password" value="123456"></property>
+            </dataSource>
+        </environment>
+    </environments>
+
+    <!-- 加载mapper映射文件 -->
+    <mappers>
+        <mapper resource="mapper/UserMapper.xml"></mapper>
+    </mappers>
+</configuration>

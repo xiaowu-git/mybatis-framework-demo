@@ -39,7 +39,7 @@ public class MybatisDemoTest {
     @Test
     public void findUserById() throws Exception {
         UserDao userDao = new UserDaoImpl(sqlSessionFactory);
-        User user = userDao.findUserById(1);
+        User user = userDao.findUserById(2);
         System.out.println(user);
     }
 
@@ -47,22 +47,25 @@ public class MybatisDemoTest {
     public void findUserByName() {
         SqlSession sqlSession = sqlSessionFactory.openSession();
         UserMapper mapper = sqlSession.getMapper(UserMapper.class);
-        User user = mapper.findUserByName("斌");
+        User user = mapper.findUserByName("王五");
         System.out.println("findUserByName -> " + user);
         sqlSession.close();
     }
 
     @Test
     public void insertUser() {
+//        sqlSessionFactory.getConfiguration().addMapper(AnnotationMapper.class);
         SqlSession sqlSession = sqlSessionFactory.openSession();
         AnnotationMapper mapper = sqlSession.getMapper(AnnotationMapper.class);
         User user = new User();
-        user.setName("王五");
+        user.setUserName("王五");
         user.setAge(18);
         user.setBirthday(new Date());
         user.setAddress("广东深圳");
-        mapper.insert(user);
-        System.out.println(user);
+        int res = mapper.insert(user);
+        sqlSession.commit();
+        System.out.println(res + " ->" + user);
+        sqlSession.close();
     }
 
 }

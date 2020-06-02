@@ -1,0 +1,16 @@
+<mapper namespace="test">
+    <!-- select 标签封装了SQL语句信息、入参类型、结果映射类型 -->
+    <select id="findUserById"
+        parameterType="com.weibin.mybatis.pojo.User"
+        resultType="com.weibin.mybatis.pojo.User" statementType="prepared">
+
+        SELECT * FROM user WHERE id=#{id} AND username like '%${username}%'
+
+        <if test="username != null and username != ''">
+            AND username like '%${username}%'
+            <if test="username != null and username != ''">
+                AND 1=1
+            </if>
+        </if>
+    </select>
+</mapper>
