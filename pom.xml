@@ -10,6 +10,7 @@
     <version>1.0-SNAPSHOT</version>
     <modules>
         <module>mybatis-use-demo</module>
+        <module>mybatis-analysis-demo</module>
     </modules>
 
     <dependencies>

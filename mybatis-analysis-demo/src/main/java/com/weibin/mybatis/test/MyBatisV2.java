@@ -32,7 +32,7 @@ public class MyBatisV2 {
 
     /**
      * 加载配置文件
-     * @param configPath
+     * @param configLocation
      */
     private void loadXml(String configLocation) {
         // 根据资源路径获取对应的输入流
